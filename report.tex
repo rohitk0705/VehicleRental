@@ -1,0 +1,220 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{array}
+
+\onehalfspacing
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+% -------------------------------------------------------------
+% TITLE PAGE
+% -------------------------------------------------------------
+\begin{titlepage}
+    \centering
+
+    {\large \textbf{Don Bosco Institute of Technology}}\\[4pt]
+    {\large (An Autonomous Institute Affiliated to University of Mumbai)}\\[12pt]
+
+    {\LARGE \textbf{Mini Project Report}}\\[8pt]
+    {\Large \textbf{On}}\\[10pt]
+    {\LARGE \textbf{Fleet Management System using Java}}\\[20pt]
+
+    {\large Submitted in partial fulfilment of the requirement}\\[4pt]
+    {\large for Java Programming Lab}\\[18pt]
+
+    {\large \textbf{Submitted By}}\\[6pt]
+    {\large Roll No.: \underline{\hspace{2cm}}}\\[6pt]
+    {\large Name: \underline{\hspace{4cm}}}\\[20pt]
+
+    {\large \textbf{Under the Guidance of}}\\[6pt]
+    {\large Ms. Priti Andhale}\\[20pt]
+
+    {\large Department of Electronics and Telecommunication Engineering}\\[25pt]
+
+    {\large Academic Year: 2025 -- 2026}
+
+\end{titlepage}
+
+% -------------------------------------------------------------
+% INDEX
+% -------------------------------------------------------------
+\tableofcontents
+\newpage
+
+% -------------------------------------------------------------
+% 1. INTRODUCTION
+% -------------------------------------------------------------
+\chapter{Introduction}
+
+The Fleet Management System is a desktop-based Java application designed to help track, manage and rent different types of vehicles such as Cars, Bikes and Trucks. The system streamlines the process of adding vehicles, marking them as rented or returned and maintaining an organised local database using text file storage.
+
+This project emphasises Object-Oriented Programming principles including inheritance, polymorphism, abstraction and the use of interfaces. A Swing-based Graphical User Interface (GUI) enables easy interaction with the system, and CSV-based import and export features support data portability. The project is suitable for small rental-based businesses and serves as an excellent academic demonstration of Java programming concepts.
+
+% -------------------------------------------------------------
+% 2. SYSTEM REQUIREMENTS
+% -------------------------------------------------------------
+\chapter{System Requirements}
+
+\textbf{Software Requirements}
+\begin{itemize}
+    \item Java Development Kit (JDK 8 or above)
+    \item IntelliJ IDEA / Eclipse / NetBeans IDE
+    \item Operating System: Windows / Linux / macOS
+    \item Text or spreadsheet editor (for CSV viewing)
+\end{itemize}
+
+\textbf{Hardware Requirements}
+\begin{itemize}
+    \item Minimum 4 GB RAM
+    \item Dual-core processor
+    \item 200 MB free disk space
+\end{itemize}
+
+% -------------------------------------------------------------
+% 3. PROPOSED SYSTEM
+% -------------------------------------------------------------
+\chapter{Proposed System}
+
+The proposed system digitalises rental fleet operations using a structured software approach. It eliminates manual record-keeping and provides consistent handling of all vehicle types via a unified interface. 
+
+Key functionalities:
+\begin{itemize}
+    \item Add new vehicles to the fleet
+    \item Rent and return vehicles with real-time status updates
+    \item Import and export fleet data through CSV
+    \item GUI interface for simplified interaction
+    \item Persistent file-based storage
+\end{itemize}
+
+The design offers reliability, clarity and extensibility for future upgrades.
+
+% -------------------------------------------------------------
+% 4. SYSTEM DESIGN
+% -------------------------------------------------------------
+\chapter{System Design}
+
+\section*{Architecture}
+
+The system follows a Model–View–Controller (MVC) structure:
+\begin{itemize}
+    \item \textbf{Model}: Vehicle, Car, Bike, Truck, Rentable, VehicleNotAvailableException
+    \item \textbf{Service}: FleetService (business logic)
+    \item \textbf{View}: FleetGUI (Java Swing based)
+\end{itemize}
+
+\section*{Class Description}
+\textbf{Vehicle}\\
+Base class with fields ID, Brand and rental status.
+
+\textbf{Car, Bike, Truck}\\
+Derived classes implementing the Rentable interface. Each overrides getTypeName() and getExtra().
+
+\textbf{FleetService}\\
+Handles add, rent, return, search, import, export and persistence.
+
+\textbf{FleetGUI}\\
+Provides the visual interface with table view, search bar and input form.
+
+% -------------------------------------------------------------
+% 5. IMPLEMENTATION (CODE)
+% -------------------------------------------------------------
+\chapter{Implementation}
+
+This section includes the main Java source files that implement the system.
+
+\section*{Vehicle.java}
+\begin{verbatim}
+[Paste your Vehicle.java contents here]
+\end{verbatim}
+
+\section*{Car.java}
+\begin{verbatim}
+[Paste your Car.java contents here]
+\end{verbatim}
+
+\section*{Bike.java}
+\begin{verbatim}
+[Paste your Bike.java contents here]
+\end{verbatim}
+
+\section*{Truck.java}
+\begin{verbatim}
+[Paste your Truck.java contents here]
+\end{verbatim}
+
+\section*{FleetService.java}
+\begin{verbatim}
+[Paste your FleetService.java contents here]
+\end{verbatim}
+
+\section*{FleetGUI.java}
+\begin{verbatim}
+[Paste your FleetGUI.java contents here]
+\end{verbatim}
+
+\section*{FleetGUILauncher.java}
+\begin{verbatim}
+[Paste your FleetGUILauncher.java contents here]
+\end{verbatim}
+
+% -------------------------------------------------------------
+% 6. RESULTS & OUTPUT SCREENS
+% -------------------------------------------------------------
+\chapter{Results and Output Screens}
+
+\begin{itemize}
+    \item Application Home Window
+    \item Adding a New Vehicle
+    \item Renting a Vehicle
+    \item Returning a Vehicle
+    \item Search and Filter Results
+    \item CSV Import/Export Demonstration
+\end{itemize}
+
+Screenshots may be included using:
+\begin{verbatim}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\linewidth]{screenshot1.png}
+\caption{Application Interface}
+\end{figure}
+\end{verbatim}
+
+% -------------------------------------------------------------
+% 7. CONCLUSION
+% -------------------------------------------------------------
+\chapter{Conclusion}
+
+The Fleet Management System successfully demonstrates the use of Object-Oriented Programming concepts and Java Swing for real-world applications. The system provides an efficient solution for managing rental vehicles with data persistence and user-friendly interaction. The structured design makes it easy to extend with additional features.
+
+% -------------------------------------------------------------
+% 8. FUTURE SCOPE
+% -------------------------------------------------------------
+\chapter{Future Scope}
+
+Potential extensions include:
+\begin{itemize}
+    \item Migration to MySQL or cloud-based database
+    \item User authentication and role-based access
+    \item Automatic invoice generation
+    \item Integration with QR codes for vehicle identification
+    \item Mobile or web-based version of the system
+\end{itemize}
+
+% -------------------------------------------------------------
+% 9. REFERENCES
+% -------------------------------------------------------------
+\chapter{References}
+\begin{itemize}
+    \item Herbert Schildt, “Java: The Complete Reference”
+    \item Oracle Java Documentation — \url{https://docs.oracle.com}
+    \item Swing Tutorials — Oracle
+    \item OOP Concepts Documentation
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,6 @@
+Compile:
+javac -cp . d:\javaRohit28\VehicleRental\*.java
+Run tests:
+java -cp d:\javaRohit28 VehicleRental.TestFleet
+Run the GUI:
+java -cp d:\javaRohit28 VehicleRental.FleetGUILauncher
