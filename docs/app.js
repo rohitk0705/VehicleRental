@@ -3,9 +3,9 @@ let isReady = false;
 let currentFleet = [];
 let fleetChart = null;
 let revenueChart = null;
-let currentCurrency = localStorage.getItem('currency') || 'USD';
-let exchangeRates = { 'USD': 1, 'EUR': 0.92, 'INR': 83.5 };
-let currencySymbols = { 'USD': '$', 'EUR': '€', 'INR': '₹' };
+let currentCurrency = 'INR';
+let exchangeRates = { 'INR': 1 };
+let currencySymbols = { 'INR': '₹' };
 
 // Auth Check
 const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -78,7 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Currency Toggle
     const currencySelect = document.querySelector('.setting-select');
     currencySelect.addEventListener('change', (e) => {
-        currentCurrency = e.target.value;
+        // Only INR supported now
+        currentCurrency = 'INR';
         localStorage.setItem('currency', currentCurrency);
         renderTable(currentFleet);
         updateStats(currentFleet);
