@@ -28,6 +28,7 @@ public class WebServer {
         server.createContext("/api/add", new AddHandler());
         server.createContext("/api/rent", new RentHandler());
         server.createContext("/api/return", new ReturnHandler());
+        server.createContext("/api/delete", new DeleteHandler());
 
         server.setExecutor(null);
         System.out.println("Server started on http://localhost:" + port);
@@ -144,6 +145,21 @@ public class WebServer {
                 Map<String, String> params = parseParams(t);
                 String result = service.returnVehicle(params.get("id"));
                 sendResponse(t, 200, result);
+            }
+        }
+    }
+
+    static class DeleteHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            if("POST".equals(t.getRequestMethod())){
+                Map<String, String> params = parseParams(t);
+                boolean deleted = service.deleteVehicle(params.get("id"));
+                if (deleted) {
+                    sendResponse(t, 200, "Deleted");
+                } else {
+                    sendResponse(t, 404, "Vehicle not found");
+                }
             }
         }
     }

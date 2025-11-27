@@ -103,6 +103,7 @@ function renderTable(data) {
                     ? `<button onclick="returnVehicle('${v.id}')" class="btn-action return">Return</button>`
                     : `<button onclick="rentVehicle('${v.id}')" class="btn-action rent">Rent</button>`
                 }
+                <button onclick="deleteVehicle('${v.id}')" class="btn-action delete" style="background-color: #c0392b; color: white; margin-left: 5px;">Delete</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -145,6 +146,29 @@ function returnVehicle(id) {
         }
     } else {
         fetch('/api/return', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id=${id}`
+        })
+        .then(response => response.text())
+        .then(msg => {
+            alert(msg);
+            loadFleet();
+        });
+    }
+}
+
+function deleteVehicle(id) {
+    if (!confirm("Are you sure you want to delete vehicle " + id + "?")) return;
+
+    if (useLocalStorage) {
+        let fleet = getLocalFleet();
+        fleet = fleet.filter(v => v.id !== id);
+        saveLocalFleet(fleet);
+        alert("Deleted (Demo Mode)");
+        loadFleet();
+    } else {
+        fetch('/api/delete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `id=${id}`

@@ -57,6 +57,16 @@ public class FleetService {
         return v.getTypeName() + " " + id + " returned.";
     }
 
+    public boolean deleteVehicle(String id) {
+        Vehicle v = searchVehicle(id);
+        if (v != null) {
+            fleet.remove(v);
+            saveFleet();
+            return true;
+        }
+        return false;
+    }
+
     public void clearData(){
         fleet.clear();
         saveFleet();
