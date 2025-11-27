@@ -1,10 +1,33 @@
 let useLocalStorage = false;
 let isReady = false;
+let currentFleet = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    const submitBtn = document.querySelector('#addForm button');
+    const submitBtn = document.querySelector('#addForm button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = "Connecting...";
+
+    // Modal Logic
+    const modal = document.getElementById('addModal');
+    const openBtn = document.getElementById('openAddModal');
+    const closeBtns = document.querySelectorAll('.close-modal');
+
+    openBtn.addEventListener('click', () => modal.classList.add('active'));
+    closeBtns.forEach(btn => btn.addEventListener('click', () => modal.classList.remove('active')));
+    modal.addEventListener('click', (e) => {
+        if(e.target === modal) modal.classList.remove('active');
+    });
+
+    // Search Logic
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = currentFleet.filter(v => 
+            v.id.toLowerCase().includes(term) || 
+            v.brand.toLowerCase().includes(term) || 
+            v.type.toLowerCase().includes(term)
+        );
+        renderTable(filtered);
+    });
 
     // Check if API is available
     fetch('/api/fleet')
@@ -17,15 +40,17 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             isReady = true;
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Vehicle';
+            submitBtn.textContent = 'Add Vehicle';
+            currentFleet = data;
             renderTable(data);
+            updateStats(data);
         })
         .catch(err => {
             console.log("API not found, switching to Demo Mode (LocalStorage)");
             useLocalStorage = true;
             isReady = true;
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Vehicle';
+            submitBtn.textContent = 'Add Vehicle';
             showDemoBanner();
             loadFleet();
         });
@@ -48,8 +73,8 @@ document.getElementById('addForm').addEventListener('submit', function(e) {
         }
         fleet.push({ id, type, brand, extra, rented: false });
         saveLocalFleet(fleet);
-        alert("Added (Demo Mode)");
         document.getElementById('addForm').reset();
+        document.getElementById('addModal').classList.remove('active');
         loadFleet();
     } else {
         fetch('/api/add', {
@@ -62,10 +87,12 @@ document.getElementById('addForm').addEventListener('submit', function(e) {
             return response.text();
         })
         .then(msg => {
-            alert(msg);
             if(msg === 'Added') {
                 document.getElementById('addForm').reset();
+                document.getElementById('addModal').classList.remove('active');
                 loadFleet();
+            } else {
+                alert(msg);
             }
         })
         .catch(err => {
@@ -78,32 +105,68 @@ document.getElementById('addForm').addEventListener('submit', function(e) {
 
 function loadFleet() {
     if (useLocalStorage) {
-        renderTable(getLocalFleet());
+        const data = getLocalFleet();
+        currentFleet = data;
+        renderTable(data);
+        updateStats(data);
     } else {
         fetch('/api/fleet')
         .then(response => response.json())
-        .then(data => renderTable(data));
+        .then(data => {
+            currentFleet = data;
+            renderTable(data);
+            updateStats(data);
+        });
     }
+}
+
+function updateStats(data) {
+    document.getElementById('totalCount').textContent = data.length;
+    document.getElementById('availableCount').textContent = data.filter(v => !v.rented).length;
+    document.getElementById('rentedCount').textContent = data.filter(v => v.rented).length;
 }
 
 function renderTable(data) {
     const tbody = document.querySelector('#fleetTable tbody');
     tbody.innerHTML = '';
     
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem; color: #64748b;">No vehicles found</td></tr>';
+        return;
+    }
+
     data.forEach(v => {
         const tr = document.createElement('tr');
+        
+        // Icon based on type
+        let icon = 'fa-car';
+        if(v.type === 'Bike') icon = 'fa-motorcycle';
+        if(v.type === 'Truck') icon = 'fa-truck';
+
         tr.innerHTML = `
-            <td>${v.id}</td>
-            <td>${v.type}</td>
-            <td>${v.brand}</td>
+            <td><span style="font-family: monospace; font-weight: 600;">${v.id}</span></td>
+            <td>
+                <div class="vehicle-info">
+                    <div class="vehicle-icon"><i class="fas ${icon}"></i></div>
+                    <div class="vehicle-text">
+                        <span class="vehicle-brand">${v.brand}</span>
+                        <span class="vehicle-type">${v.type}</span>
+                    </div>
+                </div>
+            </td>
             <td>${v.extra}</td>
-            <td><span class="status ${v.rented ? 'rented' : 'available'}">${v.rented ? 'Rented' : 'Available'}</span></td>
+            <td>
+                <span class="status-badge ${v.rented ? 'rented' : 'available'}">
+                    <span class="status-dot"></span>
+                    ${v.rented ? 'Rented' : 'Available'}
+                </span>
+            </td>
             <td>
                 ${v.rented 
-                    ? `<button onclick="returnVehicle('${v.id}')" class="btn-action return">Return</button>`
-                    : `<button onclick="rentVehicle('${v.id}')" class="btn-action rent">Rent</button>`
+                    ? `<button onclick="returnVehicle('${v.id}')" class="action-btn return" title="Return Vehicle"><i class="fas fa-undo"></i> Return</button>`
+                    : `<button onclick="rentVehicle('${v.id}')" class="action-btn rent" title="Rent Vehicle"><i class="fas fa-key"></i> Rent</button>`
                 }
-                <button onclick="deleteVehicle('${v.id}')" class="btn-action delete" style="background-color: #c0392b; color: white; margin-left: 5px;">Delete</button>
+                <button onclick="deleteVehicle('${v.id}')" class="action-btn delete" title="Delete Vehicle"><i class="fas fa-trash"></i></button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -117,7 +180,6 @@ function rentVehicle(id) {
         if (v) {
             v.rented = true;
             saveLocalFleet(fleet);
-            alert("Rented (Demo Mode)");
             loadFleet();
         }
     } else {
@@ -128,7 +190,6 @@ function rentVehicle(id) {
         })
         .then(response => response.text())
         .then(msg => {
-            alert(msg);
             loadFleet();
         });
     }
@@ -141,7 +202,6 @@ function returnVehicle(id) {
         if (v) {
             v.rented = false;
             saveLocalFleet(fleet);
-            alert("Returned (Demo Mode)");
             loadFleet();
         }
     } else {
@@ -152,7 +212,6 @@ function returnVehicle(id) {
         })
         .then(response => response.text())
         .then(msg => {
-            alert(msg);
             loadFleet();
         });
     }
@@ -165,7 +224,6 @@ function deleteVehicle(id) {
         let fleet = getLocalFleet();
         fleet = fleet.filter(v => v.id !== id);
         saveLocalFleet(fleet);
-        alert("Deleted (Demo Mode)");
         loadFleet();
     } else {
         fetch('/api/delete', {
@@ -175,7 +233,6 @@ function deleteVehicle(id) {
         })
         .then(response => response.text())
         .then(msg => {
-            alert(msg);
             loadFleet();
         });
     }
@@ -192,11 +249,22 @@ function saveLocalFleet(fleet) {
 
 function showDemoBanner() {
     const banner = document.createElement('div');
-    banner.style.background = '#f39c12';
+    banner.style.background = '#f59e0b';
     banner.style.color = 'white';
     banner.style.textAlign = 'center';
-    banner.style.padding = '10px';
-    banner.style.fontWeight = 'bold';
-    banner.innerHTML = '⚠️ Demo Mode: Running in browser (Offline). Data is saved locally.';
-    document.body.insertBefore(banner, document.body.firstChild);
+    banner.style.padding = '0.75rem';
+    banner.style.fontWeight = '600';
+    banner.style.fontSize = '0.9rem';
+    banner.style.position = 'fixed';
+    banner.style.top = '0';
+    banner.style.left = '0';
+    banner.style.width = '100%';
+    banner.style.zIndex = '2000';
+    banner.innerHTML = '<i class="fas fa-wifi-slash"></i> Demo Mode: Running offline. Data is saved locally.';
+    document.body.appendChild(banner);
+    
+    // Adjust sidebar and main content to not be hidden by banner
+    document.querySelector('.sidebar').style.top = '40px';
+    document.querySelector('.main-content').style.marginTop = '40px';
 }
+
