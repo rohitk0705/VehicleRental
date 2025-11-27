@@ -3,6 +3,9 @@ let isReady = false;
 let currentFleet = [];
 let fleetChart = null;
 let revenueChart = null;
+let currentCurrency = localStorage.getItem('currency') || 'USD';
+let exchangeRates = { 'USD': 1, 'EUR': 0.92, 'INR': 83.5 };
+let currencySymbols = { 'USD': '$', 'EUR': '€', 'INR': '₹' };
 
 // Auth Check
 const currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -11,6 +14,9 @@ if (!currentUser) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Settings
+    initSettings();
+
     // Set User Info
     if(currentUser) {
         document.getElementById('userName').textContent = currentUser.name;
@@ -51,10 +57,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Settings Logic
     document.getElementById('resetDataBtn').addEventListener('click', () => {
-        if(confirm('Are you sure? This will delete all local data.')) {
-            localStorage.removeItem('vehicle_fleet');
-            location.reload();
+        if(confirm('Are you sure? This will delete all local data and log you out.')) {
+            localStorage.clear();
+            window.location.href = 'login.html';
         }
+    });
+
+    // Dark Mode Toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    darkModeToggle.addEventListener('change', (e) => {
+        if(e.target.checked) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('darkMode', 'true');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('darkMode', 'false');
+        }
+    });
+
+    // Currency Toggle
+    const currencySelect = document.querySelector('.setting-select');
+    currencySelect.addEventListener('change', (e) => {
+        currentCurrency = e.target.value;
+        localStorage.setItem('currency', currentCurrency);
+        renderTable(currentFleet);
+        updateStats(currentFleet);
+        renderCharts();
     });
 
     const submitBtn = document.querySelector('#addForm button[type="submit"]');
@@ -110,6 +138,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 });
 
+function initSettings() {
+    // Dark Mode
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    if(isDark) {
+        document.body.classList.add('dark-mode');
+        document.getElementById('darkModeToggle').checked = true;
+    }
+
+    // Currency
+    const currencySelect = document.querySelector('.setting-select');
+    if(currencySelect) {
+        currencySelect.value = currentCurrency;
+    }
+}
+
+function formatPrice(price) {
+    const val = (price || 0) * exchangeRates[currentCurrency];
+    return currencySymbols[currentCurrency] + val.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+}
+
 function renderCharts() {
     const ctx1 = document.getElementById('fleetChart').getContext('2d');
     const ctx2 = document.getElementById('revenueChart').getContext('2d');
@@ -127,11 +175,24 @@ function renderCharts() {
             labels: ['Car', 'Bike', 'Truck'],
             datasets: [{
                 data: [counts.Car, counts.Bike, counts.Truck],
-                backgroundColor: ['#4361ee', '#10b981', '#f59e0b']
+                backgroundColor: ['#4361ee', '#10b981', '#f59e0b'],
+                borderWidth: 0
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: document.body.classList.contains('dark-mode') ? '#cbd5e1' : '#64748b' }
+                }
+            }
+        }
     });
+
+    // Mock Revenue Data scaled by currency
+    const baseData = [1200, 1900, 3000, 5000, 2000, 3000, 4500];
+    const scaledData = baseData.map(v => v * exchangeRates[currentCurrency]);
 
     if(revenueChart) revenueChart.destroy();
     revenueChart = new Chart(ctx2, {
@@ -139,13 +200,26 @@ function renderCharts() {
         data: {
             labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             datasets: [{
-                label: 'Revenue ($)',
-                data: [1200, 1900, 3000, 5000, 2000, 3000, 4500], // Mock data
+                label: `Revenue (${currentCurrency})`,
+                data: scaledData,
                 borderColor: '#4361ee',
-                tension: 0.4
+                tension: 0.4,
+                pointBackgroundColor: '#4361ee'
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            scales: {
+                x: { ticks: { color: document.body.classList.contains('dark-mode') ? '#94a3b8' : '#64748b' } },
+                y: { ticks: { color: document.body.classList.contains('dark-mode') ? '#94a3b8' : '#64748b' } }
+            },
+            plugins: {
+                legend: {
+                    labels: { color: document.body.classList.contains('dark-mode') ? '#cbd5e1' : '#64748b' }
+                }
+            }
+        }
     });
 }
 
@@ -221,7 +295,7 @@ function updateStats(data) {
     
     // Calculate Revenue (Mock: Price * 30 days for rented vehicles)
     const revenue = data.reduce((acc, v) => acc + (v.rented ? (parseFloat(v.price || 0) * 30) : 0), 0);
-    document.getElementById('revenueCount').textContent = '$' + revenue.toLocaleString();
+    document.getElementById('revenueCount').textContent = formatPrice(revenue);
 }
 
 function renderTable(data) {
@@ -253,7 +327,7 @@ function renderTable(data) {
                 </div>
             </td>
             <td>${v.extra}</td>
-            <td><span style="font-weight: 600;">$${v.price || 0}</span></td>
+            <td><span style="font-weight: 600;">${formatPrice(v.price)}</span></td>
             <td>
                 <span class="status-badge ${v.rented ? 'rented' : 'available'}">
                     <span class="status-dot"></span>
