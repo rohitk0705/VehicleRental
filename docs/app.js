@@ -1,8 +1,62 @@
 let useLocalStorage = false;
 let isReady = false;
 let currentFleet = [];
+let fleetChart = null;
+let revenueChart = null;
+
+// Auth Check
+const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+if (!currentUser) {
+    window.location.href = 'login.html';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Set User Info
+    if(currentUser) {
+        document.getElementById('userName').textContent = currentUser.name;
+        document.getElementById('userRole').textContent = currentUser.role;
+        document.getElementById('userAvatar').src = currentUser.avatar;
+    }
+
+    // Logout Logic
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'login.html';
+    });
+
+    // Navigation Logic
+    const navLinks = document.querySelectorAll('.nav-link');
+    const views = document.querySelectorAll('.view-section');
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('data-view');
+            
+            // Update Nav
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+            
+            // Update View
+            views.forEach(v => v.classList.add('hidden'));
+            document.getElementById(`view-${targetId}`).classList.remove('hidden');
+            
+            // Update Title
+            document.getElementById('pageTitle').textContent = link.textContent.trim();
+
+            // Render Charts if Analytics
+            if(targetId === 'analytics') renderCharts();
+        });
+    });
+
+    // Settings Logic
+    document.getElementById('resetDataBtn').addEventListener('click', () => {
+        if(confirm('Are you sure? This will delete all local data.')) {
+            localStorage.removeItem('vehicle_fleet');
+            location.reload();
+        }
+    });
+
     const submitBtn = document.querySelector('#addForm button[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = "Connecting...";
@@ -51,10 +105,49 @@ document.addEventListener('DOMContentLoaded', () => {
             isReady = true;
             submitBtn.disabled = false;
             submitBtn.textContent = 'Add Vehicle';
-            showDemoBanner();
+            // showDemoBanner(); // Removed as per request
             loadFleet();
         });
 });
+
+function renderCharts() {
+    const ctx1 = document.getElementById('fleetChart').getContext('2d');
+    const ctx2 = document.getElementById('revenueChart').getContext('2d');
+
+    // Count types
+    const counts = { Car: 0, Bike: 0, Truck: 0 };
+    currentFleet.forEach(v => {
+        if(counts[v.type] !== undefined) counts[v.type]++;
+    });
+
+    if(fleetChart) fleetChart.destroy();
+    fleetChart = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: ['Car', 'Bike', 'Truck'],
+            datasets: [{
+                data: [counts.Car, counts.Bike, counts.Truck],
+                backgroundColor: ['#4361ee', '#10b981', '#f59e0b']
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    if(revenueChart) revenueChart.destroy();
+    revenueChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Revenue ($)',
+                data: [1200, 1900, 3000, 5000, 2000, 3000, 4500], // Mock data
+                borderColor: '#4361ee',
+                tension: 0.4
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+}
 
 document.getElementById('addForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -99,7 +192,7 @@ document.getElementById('addForm').addEventListener('submit', function(e) {
         .catch(err => {
             alert("Error connecting to server. Switching to Demo Mode.");
             useLocalStorage = true;
-            showDemoBanner();
+            // showDemoBanner();
         });
     }
 });
@@ -125,6 +218,10 @@ function updateStats(data) {
     document.getElementById('totalCount').textContent = data.length;
     document.getElementById('availableCount').textContent = data.filter(v => !v.rented).length;
     document.getElementById('rentedCount').textContent = data.filter(v => v.rented).length;
+    
+    // Calculate Revenue (Mock: Price * 30 days for rented vehicles)
+    const revenue = data.reduce((acc, v) => acc + (v.rented ? (parseFloat(v.price || 0) * 30) : 0), 0);
+    document.getElementById('revenueCount').textContent = '$' + revenue.toLocaleString();
 }
 
 function renderTable(data) {
@@ -132,7 +229,7 @@ function renderTable(data) {
     tbody.innerHTML = '';
     
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 2rem; color: #64748b;">No vehicles found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 2rem; color: #64748b;">No vehicles found</td></tr>';
         return;
     }
 
@@ -249,24 +346,5 @@ function saveLocalFleet(fleet) {
     localStorage.setItem('vehicle_fleet', JSON.stringify(fleet));
 }
 
-function showDemoBanner() {
-    const banner = document.createElement('div');
-    banner.style.background = '#f59e0b';
-    banner.style.color = 'white';
-    banner.style.textAlign = 'center';
-    banner.style.padding = '0.75rem';
-    banner.style.fontWeight = '600';
-    banner.style.fontSize = '0.9rem';
-    banner.style.position = 'fixed';
-    banner.style.top = '0';
-    banner.style.left = '0';
-    banner.style.width = '100%';
-    banner.style.zIndex = '2000';
-    banner.innerHTML = '<i class="fas fa-wifi-slash"></i> Demo Mode: Running offline. Data is saved locally.';
-    document.body.appendChild(banner);
-    
-    // Adjust sidebar and main content to not be hidden by banner
-    document.querySelector('.sidebar').style.top = '40px';
-    document.querySelector('.main-content').style.marginTop = '40px';
-}
+// Removed showDemoBanner function as requested
 

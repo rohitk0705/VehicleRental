@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css?v=2.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="app-container">
@@ -19,17 +20,17 @@
                 <span>FleetManager</span>
             </div>
             <nav class="nav-menu">
-                <a href="#" class="nav-link active"><i class="fas fa-th-large"></i> Dashboard</a>
-                <a href="#" class="nav-link"><i class="fas fa-car"></i> Vehicles</a>
-                <a href="#" class="nav-link"><i class="fas fa-chart-bar"></i> Analytics</a>
-                <a href="#" class="nav-link"><i class="fas fa-cog"></i> Settings</a>
+                <a href="#" class="nav-link active" data-view="dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="#" class="nav-link" data-view="analytics"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a href="#" class="nav-link" data-view="settings"><i class="fas fa-cog"></i> Settings</a>
             </nav>
             <div class="user-profile">
-                <div class="avatar"><img src="https://ui-avatars.com/api/?name=Admin+User&background=3498db&color=fff" alt="User"></div>
+                <div class="avatar"><img id="userAvatar" src="" alt="User"></div>
                 <div class="user-info">
-                    <span class="name">Admin User</span>
-                    <span class="role">Fleet Manager</span>
+                    <span class="name" id="userName">User</span>
+                    <span class="role" id="userRole">Manager</span>
                 </div>
+                <button id="logoutBtn" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </aside>
 
@@ -37,7 +38,7 @@
         <main class="main-content">
             <header class="top-bar">
                 <div class="breadcrumbs">
-                    <span>App</span> / <span class="current">Dashboard</span>
+                    <span>App</span> / <span class="current" id="pageTitle">Dashboard</span>
                 </div>
                 <div class="actions">
                     <button class="btn-icon"><i class="fas fa-bell"></i><span class="badge">3</span></button>
@@ -45,67 +46,134 @@
                 </div>
             </header>
 
-            <!-- Stats Grid -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="icon-box blue"><i class="fas fa-car"></i></div>
-                    <div class="stat-info">
-                        <h3>Total Fleet</h3>
-                        <p id="totalCount">0</p>
+            <!-- Dashboard View -->
+            <div id="view-dashboard" class="view-section">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="icon-box blue"><i class="fas fa-car"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Fleet</h3>
+                            <p id="totalCount">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-box green"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <h3>Available</h3>
+                            <p id="availableCount">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-box orange"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h3>Rented Out</h3>
+                            <p id="rentedCount">0</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-box purple"><i class="fas fa-wallet"></i></div>
+                        <div class="stat-info">
+                            <h3>Est. Revenue</h3>
+                            <p id="revenueCount">$0</p>
+                        </div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="icon-box green"><i class="fas fa-check-circle"></i></div>
-                    <div class="stat-info">
-                        <h3>Available</h3>
-                        <p id="availableCount">0</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon-box orange"><i class="fas fa-clock"></i></div>
-                    <div class="stat-info">
-                        <h3>Rented Out</h3>
-                        <p id="rentedCount">0</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon-box purple"><i class="fas fa-wallet"></i></div>
-                    <div class="stat-info">
-                        <h3>Revenue</h3>
-                        <p>$12,450</p>
+
+                <!-- Content Area -->
+                <div class="content-grid">
+                    <div class="card table-card">
+                        <div class="card-header">
+                            <h3>Vehicle Inventory</h3>
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="searchInput" placeholder="Search by ID, Brand or Type...">
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="fleetTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Vehicle Info</th>
+                                        <th>Specs</th>
+                                        <th>Price/Day</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- JS will populate this -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Content Area -->
-            <div class="content-grid">
-                <div class="card table-card">
-                    <div class="card-header">
-                        <h3>Vehicle Inventory</h3>
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="searchInput" placeholder="Search by ID, Brand or Type...">
+            <!-- Analytics View -->
+            <div id="view-analytics" class="view-section hidden">
+                <div class="charts-grid">
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3>Fleet Composition</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="fleetChart"></canvas>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <table id="fleetTable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Vehicle Info</th>
-                                    <th>Specs</th>
-                                    <th>Price/Day</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- JS will populate this -->
-                            </tbody>
-                        </table>
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3>Revenue Projection</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Settings View -->
+            <div id="view-settings" class="view-section hidden">
+                <div class="settings-container">
+                    <div class="card settings-card">
+                        <div class="card-header">
+                            <h3>Application Settings</h3>
+                        </div>
+                        <div class="settings-body">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Dark Mode</h4>
+                                    <p>Enable dark theme for the dashboard</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="darkModeToggle">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <h4>Currency</h4>
+                                    <p>Select your preferred currency display</p>
+                                </div>
+                                <select class="setting-select">
+                                    <option value="USD">USD ($)</option>
+                                    <option value="EUR">EUR (€)</option>
+                                    <option value="INR">INR (₹)</option>
+                                </select>
+                            </div>
+                            <div class="setting-item danger-zone">
+                                <div class="setting-info">
+                                    <h4>Reset Data</h4>
+                                    <p>Clear all local data and reset to defaults</p>
+                                </div>
+                                <button class="btn-danger" id="resetDataBtn">Reset All Data</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
