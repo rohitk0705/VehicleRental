@@ -17,43 +17,24 @@ A Java-based Vehicle Rental System that allows users to manage a fleet of vehicl
 
 ## How to Run
 
-### Option 1: Run from Source
+The project is divided into two parts: an **Online Version** (Web-based) and an **Offline Version** (Desktop GUI).
 
-1.  Compile the project:
-    ```bash
-    javac -cp . VehicleRental/*.java
-    ```
-2.  Run the GUI:
-    ```bash
-    java -cp . VehicleRental.FleetGUILauncher
-    ```
+### 1. Online Version (Web)
+Runs a local web server. You can access the dashboard via your browser.
+- **Double-click** `RunOnline.bat`
+- Open browser to: [http://localhost:8080](http://localhost:8080)
 
-### Option 2: Run the JAR file
-
-If you have downloaded the `VehicleRental.jar` file:
-
-```bash
-java -jar VehicleRental.jar
-```
-
-### Option 3: Run as Web Application
-
-You can run the application as a local web server and access it via your browser.
-
-1.  Run the server:
-    ```bash
-    java -cp VehicleRental.jar VehicleRental.WebServer
-    ```
-    (Or simply double-click `run_server.bat`)
-
-2.  Open your browser and visit: [http://localhost:8080](http://localhost:8080)
+### 2. Offline Version (Desktop)
+Runs a standalone Java Swing application.
+- **Double-click** `RunOffline.bat`
 
 ## Project Structure
 
-- `VehicleRental/` - Package containing source code.
-- `docs/` - HTML/CSS/JS files for the web interface.
-- `fleet.txt` - Database file for storing vehicle records.
-- `Report.tex` - Project report in LaTeX format.
+- `Backend/Common` - Shared business logic and models.
+- `Backend/Web` - Web server implementation.
+- `Backend/Desktop` - Swing GUI implementation.
+- `docs/` - Frontend files (HTML/CSS/JS).
+- `fleet.txt` - Shared database file.
 
 ## Author
 

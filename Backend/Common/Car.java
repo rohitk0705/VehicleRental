@@ -1,4 +1,4 @@
-package Backend;
+package Backend.Common;
 
 public class Car extends Vehicle implements Rentable {
     private String seats;

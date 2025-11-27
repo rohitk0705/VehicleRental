@@ -1,4 +1,4 @@
-package Backend;
+package Backend.Common;
 
 public class Vehicle {
     private String id;

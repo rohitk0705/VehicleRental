@@ -1,4 +1,4 @@
-package Backend;
+package Backend.Common;
 
 public class Truck extends Vehicle implements Rentable {
     private double loadCapacity;

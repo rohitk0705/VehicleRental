@@ -1,4 +1,4 @@
-package Backend;
+package Backend.Desktop;
 
 import javax.swing.SwingUtilities;
 

@@ -1,4 +1,4 @@
-package Backend;
+package Backend.Common;
 
 public class TestFleet {
     public static void main(String[] args) {

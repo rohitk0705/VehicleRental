@@ -1,5 +1,6 @@
-package Backend;
+package Backend.Desktop;
 
+import Backend.Common.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
@@ -12,7 +13,7 @@ public class FleetGUI extends JFrame implements ActionListener {
     private FleetService service;
     private JTable table;
     private DefaultTableModel model;
-    private JTextField idField, brandField, extraField, searchField;
+    private JTextField idField, brandField, extraField, priceField, searchField;
     private JComboBox<String> typeCombo;
     private JButton addBtn, rentBtn, returnBtn, importBtn, exportBtn, clearBtn, exitBtn;
 
@@ -28,7 +29,7 @@ public class FleetGUI extends JFrame implements ActionListener {
 
     private void initUI(){
         setTitle("Fleet Manager");
-        setSize(850, 520);
+        setSize(950, 520);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -51,6 +52,10 @@ public class FleetGUI extends JFrame implements ActionListener {
         extraField = new JTextField(8);
         inputs.add(new JLabel("Extra"));
         inputs.add(extraField);
+
+        priceField = new JTextField(6);
+        inputs.add(new JLabel("Price"));
+        inputs.add(priceField);
 
         addBtn = new JButton("Add");
         addBtn.addActionListener(this);
@@ -155,8 +160,9 @@ public class FleetGUI extends JFrame implements ActionListener {
         String id = idField.getText().trim();
         String brand = brandField.getText().trim();
         String extra = extraField.getText().trim();
+        String priceStr = priceField.getText().trim();
 
-        if (id.isEmpty() || brand.isEmpty() || extra.isEmpty()) {
+        if (id.isEmpty() || brand.isEmpty() || extra.isEmpty() || priceStr.isEmpty()) {
             JOptionPane.showMessageDialog(this,"Fill all fields","Error",
                     JOptionPane.ERROR_MESSAGE);
             return;
@@ -169,18 +175,19 @@ public class FleetGUI extends JFrame implements ActionListener {
         }
 
         try {
+            double price = Double.parseDouble(priceStr);
             switch (type) {
                 case "Car":
-                    service.addVehicle(new Car(id, brand, extra));
+                    service.addVehicle(new Car(id, brand, extra, price));
                     break;
 
                 case "Bike":
-                    service.addVehicle(new Bike(id, brand, extra));
+                    service.addVehicle(new Bike(id, brand, extra, price));
                     break;
 
                 case "Truck":
                     double load = Double.parseDouble(extra);
-                    service.addVehicle(new Truck(id, brand, load));
+                    service.addVehicle(new Truck(id, brand, load, price));
                     break;
             }
 
@@ -188,7 +195,7 @@ public class FleetGUI extends JFrame implements ActionListener {
             clearInputs();
 
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this,"Invalid number in Extra",
+            JOptionPane.showMessageDialog(this,"Invalid number in Extra or Price",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -197,6 +204,7 @@ public class FleetGUI extends JFrame implements ActionListener {
         idField.setText("");
         brandField.setText("");
         extraField.setText("");
+        priceField.setText("");
         idField.requestFocusInWindow();
     }
 
