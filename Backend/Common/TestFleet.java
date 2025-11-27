@@ -6,7 +6,7 @@ public class TestFleet {
 
         System.out.println("Initial fleet size: " + fs.getFleet().size());
 
-        Car c = new Car("MH01CG9394","Toyota","5");
+        Car c = new Car("MH01CG9394","Toyota","5", 50.0);
         fs.addVehicle(c);
 
         System.out.println("After add, fleet size: " + fs.getFleet().size());
