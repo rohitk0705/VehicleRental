@@ -294,8 +294,8 @@ function updateStats(data) {
     document.getElementById('availableCount').textContent = data.filter(v => !v.rented).length;
     document.getElementById('rentedCount').textContent = data.filter(v => v.rented).length;
     
-    // Calculate Revenue (Mock: Price * 30 days for rented vehicles)
-    const revenue = data.reduce((acc, v) => acc + (v.rented ? (parseFloat(v.price || 0) * 30) : 0), 0);
+    // Calculate Revenue (Daily revenue from rented vehicles)
+    const revenue = data.reduce((acc, v) => acc + (v.rented ? parseFloat(v.price || 0) : 0), 0);
     document.getElementById('revenueCount').textContent = formatPrice(revenue);
 }
 
