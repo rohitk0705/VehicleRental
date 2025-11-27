@@ -1,4 +1,4 @@
-package VehicleRental;
+package Backend;
 
 public class Car extends Vehicle implements Rentable {
     private String seats;

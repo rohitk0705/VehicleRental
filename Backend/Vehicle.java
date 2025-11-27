@@ -1,4 +1,4 @@
-package VehicleRental;
+package Backend;
 
 public class Vehicle {
     private String id;

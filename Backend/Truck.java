@@ -1,4 +1,4 @@
-package VehicleRental;
+package Backend;
 
 public class Truck extends Vehicle implements Rentable {
     private double loadCapacity;

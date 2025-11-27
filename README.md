@@ -36,9 +36,22 @@ If you have downloaded the `VehicleRental.jar` file:
 java -jar VehicleRental.jar
 ```
 
+### Option 3: Run as Web Application
+
+You can run the application as a local web server and access it via your browser.
+
+1.  Run the server:
+    ```bash
+    java -cp VehicleRental.jar VehicleRental.WebServer
+    ```
+    (Or simply double-click `run_server.bat`)
+
+2.  Open your browser and visit: [http://localhost:8080](http://localhost:8080)
+
 ## Project Structure
 
 - `VehicleRental/` - Package containing source code.
+- `docs/` - HTML/CSS/JS files for the web interface.
 - `fleet.txt` - Database file for storing vehicle records.
 - `Report.tex` - Project report in LaTeX format.
 

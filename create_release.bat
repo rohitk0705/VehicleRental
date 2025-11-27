@@ -1,8 +1,6 @@
 @echo off
-echo Moving to project root...
-cd ..
 echo Compiling Java files...
-javac VehicleRental/*.java
+javac Backend/*.java
 if %errorlevel% neq 0 (
     echo Compilation failed!
     pause
@@ -10,7 +8,7 @@ if %errorlevel% neq 0 (
 )
 
 echo Creating Runnable JAR...
-jar cfm VehicleRental/VehicleRental.jar VehicleRental/MANIFEST.MF VehicleRental/*.class
+jar cfm VehicleRental.jar MANIFEST.MF Backend/*.class
 
 echo.
 echo -------------------------------------------------------

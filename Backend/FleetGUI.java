@@ -1,4 +1,4 @@
-package VehicleRental;
+package Backend;
 
 import javax.swing.*;
 import javax.swing.table.*;

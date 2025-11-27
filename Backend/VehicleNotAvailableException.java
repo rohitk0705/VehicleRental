@@ -1,4 +1,4 @@
-package VehicleRental;
+package Backend;
 
 public class VehicleNotAvailableException extends Exception {
     public VehicleNotAvailableException(String message) {

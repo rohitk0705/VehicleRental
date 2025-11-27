@@ -1,4 +1,4 @@
-package VehicleRental;
+package Backend;
 
 public class Bike extends Vehicle implements Rentable {
     private String bikeType;

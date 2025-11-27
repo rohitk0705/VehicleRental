@@ -1,4 +1,4 @@
-package VehicleRental;
+package Backend;
 
 public class TestFleet {
     public static void main(String[] args) {
