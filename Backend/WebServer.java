@@ -70,8 +70,8 @@ public class WebServer {
             StringBuilder json = new StringBuilder("[");
             for(int i=0; i<fleet.size(); i++){
                 Vehicle v = fleet.get(i);
-                json.append(String.format("{\"id\":\"%s\",\"type\":\"%s\",\"brand\":\"%s\",\"rented\":%b,\"extra\":\"%s\",\"price\":%.2f}",
-                    escape(v.getId()), escape(v.getTypeName()), escape(v.getBrand()), v.isRented(), escape(v.getExtra()), v.getPrice()));
+                json.append(String.format("{\"id\":\"%s\",\"type\":\"%s\",\"brand\":\"%s\",\"rented\":%b,\"extra\":\"%s\",\"price\":%.2f,\"rentalCount\":%d}",
+                    escape(v.getId()), escape(v.getTypeName()), escape(v.getBrand()), v.isRented(), escape(v.getExtra()), v.getPrice(), v.getRentalCount()));
                 if(i < fleet.size()-1) json.append(",");
             }
             json.append("]");

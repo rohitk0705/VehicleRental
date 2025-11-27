@@ -240,7 +240,7 @@ document.getElementById('addForm').addEventListener('submit', function(e) {
             alert("ID already exists");
             return;
         }
-        fleet.push({ id, type, brand, extra, price, rented: false });
+        fleet.push({ id, type, brand, extra, price, rented: false, rentalCount: 0 });
         saveLocalFleet(fleet);
         document.getElementById('addForm').reset();
         document.getElementById('addModal').classList.remove('active');
@@ -294,8 +294,8 @@ function updateStats(data) {
     document.getElementById('availableCount').textContent = data.filter(v => !v.rented).length;
     document.getElementById('rentedCount').textContent = data.filter(v => v.rented).length;
     
-    // Calculate Revenue (Daily revenue from rented vehicles)
-    const revenue = data.reduce((acc, v) => acc + (v.rented ? parseFloat(v.price || 0) : 0), 0);
+    // Calculate Total Revenue (Historical)
+    const revenue = data.reduce((acc, v) => acc + ((v.rentalCount || 0) * parseFloat(v.price || 0)), 0);
     document.getElementById('revenueCount').textContent = formatPrice(revenue);
 }
 
@@ -329,6 +329,7 @@ function renderTable(data) {
             </td>
             <td>${v.extra}</td>
             <td><span style="font-weight: 600;">${formatPrice(v.price)}</span></td>
+            <td><span style="color: #64748b;">${v.rentalCount || 0}</span></td>
             <td>
                 <span class="status-badge ${v.rented ? 'rented' : 'available'}">
                     <span class="status-dot"></span>
@@ -353,6 +354,7 @@ function rentVehicle(id) {
         const v = fleet.find(v => v.id === id);
         if (v) {
             v.rented = true;
+            v.rentalCount = (v.rentalCount || 0) + 1;
             saveLocalFleet(fleet);
             loadFleet();
         }

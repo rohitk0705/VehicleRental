@@ -39,6 +39,7 @@ public class FleetService {
 
         try {
             ((Rentable)v).rent();
+            v.incrementRentalCount();
             saveFleet();
             return v.getTypeName() + " " + id + " rented.";
         } catch (VehicleNotAvailableException e){
@@ -86,6 +87,14 @@ public class FleetService {
                 boolean rented = Boolean.parseBoolean(p[3]);
                 String extra = p[4];
                 double price = Double.parseDouble(p[5]);
+                int rentalCount = 0;
+                if (p.length > 6) {
+                    try {
+                        rentalCount = Integer.parseInt(p[6]);
+                    } catch (NumberFormatException e) {
+                        rentalCount = 0;
+                    }
+                }
 
                 if (existsId(id)) continue;
 
@@ -99,6 +108,7 @@ public class FleetService {
 
                 if (v != null) {
                     v.setRented(rented);
+                    v.setRentalCount(rentalCount);
                     fleet.add(v);
                 }
             }
@@ -115,7 +125,8 @@ public class FleetService {
                     v.getBrand() + "," +
                     v.isRented() + "," +
                     v.getExtra() + "," +
-                    v.getPrice()
+                    v.getPrice() + "," +
+                    v.getRentalCount()
                 );
             }
         }
@@ -137,6 +148,14 @@ public class FleetService {
                 boolean rented = Boolean.parseBoolean(p[3]);
                 String extra = p[4];
                 double price = Double.parseDouble(p[5]);
+                int rentalCount = 0;
+                if (p.length > 6) {
+                    try {
+                        rentalCount = Integer.parseInt(p[6]);
+                    } catch (NumberFormatException e) {
+                        rentalCount = 0;
+                    }
+                }
 
                 Vehicle v = null;
 
@@ -148,6 +167,7 @@ public class FleetService {
 
                 if (v != null) {
                     v.setRented(rented);
+                    v.setRentalCount(rentalCount);
                     fleet.add(v);
                 }
             }
@@ -165,7 +185,8 @@ public class FleetService {
                     v.getBrand() + "," +
                     v.isRented() + "," +
                     v.getExtra() + "," +
-                    v.getPrice()
+                    v.getPrice() + "," +
+                    v.getRentalCount()
                 );
             }
         } catch (IOException e) {
