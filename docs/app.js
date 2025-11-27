@@ -1,6 +1,11 @@
 let useLocalStorage = false;
+let isReady = false;
 
 document.addEventListener('DOMContentLoaded', () => {
+    const submitBtn = document.querySelector('#addForm button');
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Connecting...";
+
     // Check if API is available
     fetch('/api/fleet')
         .then(response => {
@@ -10,11 +15,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return response.json();
         })
         .then(data => {
+            isReady = true;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Vehicle';
             renderTable(data);
         })
         .catch(err => {
             console.log("API not found, switching to Demo Mode (LocalStorage)");
             useLocalStorage = true;
+            isReady = true;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Add Vehicle';
             showDemoBanner();
             loadFleet();
         });
@@ -22,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('addForm').addEventListener('submit', function(e) {
     e.preventDefault();
+    if (!isReady) return;
     
     const type = document.getElementById('type').value;
     const id = document.getElementById('id').value;
@@ -45,13 +57,21 @@ document.getElementById('addForm').addEventListener('submit', function(e) {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `type=${type}&id=${id}&brand=${brand}&extra=${extra}`
         })
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) throw new Error("Server Error");
+            return response.text();
+        })
         .then(msg => {
             alert(msg);
             if(msg === 'Added') {
                 document.getElementById('addForm').reset();
                 loadFleet();
             }
+        })
+        .catch(err => {
+            alert("Error connecting to server. Switching to Demo Mode.");
+            useLocalStorage = true;
+            showDemoBanner();
         });
     }
 });
