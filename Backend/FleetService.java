@@ -78,22 +78,23 @@ public class FleetService {
 
             while((line = br.readLine()) != null){
                 String[] p = line.split(",");
-                if (p.length < 5) continue;
+                if (p.length < 6) continue;
 
                 String type = p[0];
                 String id = p[1];
                 String brand = p[2];
                 boolean rented = Boolean.parseBoolean(p[3]);
                 String extra = p[4];
+                double price = Double.parseDouble(p[5]);
 
                 if (existsId(id)) continue;
 
                 Vehicle v = null;
 
                 switch (type) {
-                    case "Car": v = new Car(id, brand, extra); break;
-                    case "Bike": v = new Bike(id, brand, extra); break;
-                    case "Truck": v = new Truck(id, brand, Double.parseDouble(extra)); break;
+                    case "Car": v = new Car(id, brand, extra, price); break;
+                    case "Bike": v = new Bike(id, brand, extra, price); break;
+                    case "Truck": v = new Truck(id, brand, Double.parseDouble(extra), price); break;
                 }
 
                 if (v != null) {
@@ -113,7 +114,8 @@ public class FleetService {
                     v.getId() + "," +
                     v.getBrand() + "," +
                     v.isRented() + "," +
-                    v.getExtra()
+                    v.getExtra() + "," +
+                    v.getPrice()
                 );
             }
         }
@@ -127,20 +129,21 @@ public class FleetService {
 
             while((line = br.readLine()) != null){
                 String[] p = line.split(",");
-                if (p.length < 5) continue;
+                if (p.length < 6) continue;
 
                 String type = p[0];
                 String id = p[1];
                 String brand = p[2];
                 boolean rented = Boolean.parseBoolean(p[3]);
                 String extra = p[4];
+                double price = Double.parseDouble(p[5]);
 
                 Vehicle v = null;
 
                 switch (type) {
-                    case "Car": v = new Car(id, brand, extra); break;
-                    case "Bike": v = new Bike(id, brand, extra); break;
-                    case "Truck": v = new Truck(id, brand, Double.parseDouble(extra)); break;
+                    case "Car": v = new Car(id, brand, extra, price); break;
+                    case "Bike": v = new Bike(id, brand, extra, price); break;
+                    case "Truck": v = new Truck(id, brand, Double.parseDouble(extra), price); break;
                 }
 
                 if (v != null) {
@@ -161,7 +164,8 @@ public class FleetService {
                     v.getId() + "," +
                     v.getBrand() + "," +
                     v.isRented() + "," +
-                    v.getExtra()
+                    v.getExtra() + "," +
+                    v.getPrice()
                 );
             }
         } catch (IOException e) {

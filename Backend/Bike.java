@@ -3,8 +3,8 @@ package Backend;
 public class Bike extends Vehicle implements Rentable {
     private String bikeType;
 
-    public Bike(String id, String brand, String bikeType){
-        super(id, brand);
+    public Bike(String id, String brand, String bikeType, double price){
+        super(id, brand, price);
         this.bikeType = bikeType;
     }
 

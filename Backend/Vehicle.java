@@ -4,15 +4,18 @@ public class Vehicle {
     private String id;
     private String brand;
     private boolean rented;
+    private double price;
 
-    public Vehicle(String id, String brand) {
+    public Vehicle(String id, String brand, double price) {
         this.id = id;
         this.brand = brand;
+        this.price = price;
         this.rented = false;
     }
 
     public String getId() { return id; }
     public String getBrand() { return brand; }
+    public double getPrice() { return price; }
     public boolean isRented() { return rented; }
     public void setRented(boolean r) { this.rented = r; }
 

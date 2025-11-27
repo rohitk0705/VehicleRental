@@ -3,8 +3,8 @@ package Backend;
 public class Truck extends Vehicle implements Rentable {
     private double loadCapacity;
 
-    public Truck(String id, String brand, double loadCapacity){
-        super(id, brand);
+    public Truck(String id, String brand, double loadCapacity, double price){
+        super(id, brand, price);
         this.loadCapacity = loadCapacity;
     }
 

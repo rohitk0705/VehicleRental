@@ -70,8 +70,8 @@ public class WebServer {
             StringBuilder json = new StringBuilder("[");
             for(int i=0; i<fleet.size(); i++){
                 Vehicle v = fleet.get(i);
-                json.append(String.format("{\"id\":\"%s\",\"type\":\"%s\",\"brand\":\"%s\",\"rented\":%b,\"extra\":\"%s\"}",
-                    escape(v.getId()), escape(v.getTypeName()), escape(v.getBrand()), v.isRented(), escape(v.getExtra())));
+                json.append(String.format("{\"id\":\"%s\",\"type\":\"%s\",\"brand\":\"%s\",\"rented\":%b,\"extra\":\"%s\",\"price\":%.2f}",
+                    escape(v.getId()), escape(v.getTypeName()), escape(v.getBrand()), v.isRented(), escape(v.getExtra()), v.getPrice()));
                 if(i < fleet.size()-1) json.append(",");
             }
             json.append("]");
@@ -99,6 +99,12 @@ public class WebServer {
                 String id = params.get("id");
                 String brand = params.get("brand");
                 String extra = params.get("extra");
+                double price = 0.0;
+                try {
+                    price = Double.parseDouble(params.get("price"));
+                } catch (Exception e) {
+                    price = 0.0;
+                }
 
                 if(service.existsId(id)){
                     sendResponse(t, 400, "ID already exists");
@@ -108,9 +114,9 @@ public class WebServer {
                 Vehicle v = null;
                 try {
                     switch (type) {
-                        case "Car": v = new Car(id, brand, extra); break;
-                        case "Bike": v = new Bike(id, brand, extra); break;
-                        case "Truck": v = new Truck(id, brand, Double.parseDouble(extra)); break;
+                        case "Car": v = new Car(id, brand, extra, price); break;
+                        case "Bike": v = new Bike(id, brand, extra, price); break;
+                        case "Truck": v = new Truck(id, brand, Double.parseDouble(extra), price); break;
                     }
                     if(v != null) {
                         service.addVehicle(v);

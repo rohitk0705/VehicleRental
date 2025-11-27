@@ -64,6 +64,7 @@ document.getElementById('addForm').addEventListener('submit', function(e) {
     const id = document.getElementById('id').value;
     const brand = document.getElementById('brand').value;
     const extra = document.getElementById('extra').value;
+    const price = document.getElementById('price').value;
 
     if (useLocalStorage) {
         const fleet = getLocalFleet();
@@ -71,7 +72,7 @@ document.getElementById('addForm').addEventListener('submit', function(e) {
             alert("ID already exists");
             return;
         }
-        fleet.push({ id, type, brand, extra, rented: false });
+        fleet.push({ id, type, brand, extra, price, rented: false });
         saveLocalFleet(fleet);
         document.getElementById('addForm').reset();
         document.getElementById('addModal').classList.remove('active');
@@ -80,7 +81,7 @@ document.getElementById('addForm').addEventListener('submit', function(e) {
         fetch('/api/add', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `type=${type}&id=${id}&brand=${brand}&extra=${extra}`
+            body: `type=${type}&id=${id}&brand=${brand}&extra=${extra}&price=${price}`
         })
         .then(response => {
             if (!response.ok) throw new Error("Server Error");
@@ -155,6 +156,7 @@ function renderTable(data) {
                 </div>
             </td>
             <td>${v.extra}</td>
+            <td><span style="font-weight: 600;">$${v.price || 0}</span></td>
             <td>
                 <span class="status-badge ${v.rented ? 'rented' : 'available'}">
                     <span class="status-dot"></span>

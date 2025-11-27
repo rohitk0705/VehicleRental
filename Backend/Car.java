@@ -3,8 +3,8 @@ package Backend;
 public class Car extends Vehicle implements Rentable {
     private String seats;
 
-    public Car(String id, String brand, String seats){
-        super(id, brand);
+    public Car(String id, String brand, String seats, double price){
+        super(id, brand, price);
         this.seats = seats;
     }
 
