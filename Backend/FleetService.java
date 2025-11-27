@@ -68,6 +68,28 @@ public class FleetService {
         return false;
     }
 
+    public boolean updateVehicle(String id, String brand, String extra, double price) {
+        Vehicle v = searchVehicle(id);
+        if (v == null) return false;
+
+        v.setBrand(brand);
+        v.setPrice(price);
+
+        if (v instanceof Car) {
+            ((Car) v).setSeats(extra);
+        } else if (v instanceof Bike) {
+            ((Bike) v).setBikeType(extra);
+        } else if (v instanceof Truck) {
+            try {
+                ((Truck) v).setLoadCapacity(Double.parseDouble(extra));
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        saveFleet();
+        return true;
+    }
+
     public void clearData(){
         fleet.clear();
         saveFleet();

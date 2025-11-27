@@ -92,13 +92,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modal Logic
     const modal = document.getElementById('addModal');
+    const editModal = document.getElementById('editModal');
     const openBtn = document.getElementById('openAddModal');
     const closeBtns = document.querySelectorAll('.close-modal');
 
     openBtn.addEventListener('click', () => modal.classList.add('active'));
-    closeBtns.forEach(btn => btn.addEventListener('click', () => modal.classList.remove('active')));
+    closeBtns.forEach(btn => btn.addEventListener('click', () => {
+        modal.classList.remove('active');
+        editModal.classList.remove('active');
+    }));
     modal.addEventListener('click', (e) => {
         if(e.target === modal) modal.classList.remove('active');
+    });
+    editModal.addEventListener('click', (e) => {
+        if(e.target === editModal) editModal.classList.remove('active');
     });
 
     // Search Logic
@@ -224,7 +231,7 @@ function renderCharts() {
     });
 }
 
-document.getElementById('addForm').addEventListener('submit', function(e) {
+    document.getElementById('addForm').addEventListener('submit', function(e) {
     e.preventDefault();
     if (!isReady) return;
     
@@ -268,6 +275,49 @@ document.getElementById('addForm').addEventListener('submit', function(e) {
             alert("Error connecting to server. Switching to Demo Mode.");
             useLocalStorage = true;
             // showDemoBanner();
+        });
+    }
+});
+
+document.getElementById('editForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const id = document.getElementById('editId').value;
+    const brand = document.getElementById('editBrand').value;
+    const extra = document.getElementById('editExtra').value;
+    const price = document.getElementById('editPrice').value;
+
+    if (useLocalStorage) {
+        const fleet = getLocalFleet();
+        const v = fleet.find(v => v.id === id);
+        if (v) {
+            v.brand = brand;
+            v.extra = extra;
+            v.price = price;
+            saveLocalFleet(fleet);
+            document.getElementById('editModal').classList.remove('active');
+            loadFleet();
+        }
+    } else {
+        fetch('/api/edit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id=${id}&brand=${brand}&extra=${extra}&price=${price}`
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Server Error");
+            return response.text();
+        })
+        .then(msg => {
+            if(msg === 'Updated') {
+                document.getElementById('editModal').classList.remove('active');
+                loadFleet();
+            } else {
+                alert(msg);
+            }
+        })
+        .catch(err => {
+            alert("Error connecting to server.");
         });
     }
 });
@@ -341,11 +391,25 @@ function renderTable(data) {
                     ? `<button onclick="returnVehicle('${v.id}')" class="action-btn return" title="Return Vehicle"><i class="fas fa-undo"></i> Return</button>`
                     : `<button onclick="rentVehicle('${v.id}')" class="action-btn rent" title="Rent Vehicle"><i class="fas fa-key"></i> Rent</button>`
                 }
+                <button onclick="editVehicle('${v.id}')" class="action-btn edit" title="Edit Vehicle"><i class="fas fa-edit"></i></button>
                 <button onclick="deleteVehicle('${v.id}')" class="action-btn delete" title="Delete Vehicle"><i class="fas fa-trash"></i></button>
             </td>
         `;
         tbody.appendChild(tr);
     });
+}
+
+function editVehicle(id) {
+    const v = currentFleet.find(v => v.id === id);
+    if (!v) return;
+
+    document.getElementById('editId').value = v.id;
+    document.getElementById('editIdDisplay').value = v.id;
+    document.getElementById('editBrand').value = v.brand;
+    document.getElementById('editPrice').value = v.price;
+    document.getElementById('editExtra').value = v.extra;
+
+    document.getElementById('editModal').classList.add('active');
 }
 
 function rentVehicle(id) {

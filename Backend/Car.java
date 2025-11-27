@@ -9,6 +9,7 @@ public class Car extends Vehicle implements Rentable {
     }
 
     public String getSeats(){ return seats; }
+    public void setSeats(String seats) { this.seats = seats; }
 
     @Override
     public void rent() throws VehicleNotAvailableException {

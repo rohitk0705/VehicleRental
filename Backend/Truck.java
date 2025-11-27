@@ -27,4 +27,5 @@ public class Truck extends Vehicle implements Rentable {
     public String getExtra(){ return Double.toString(loadCapacity); }
 
     public double getLoadCapacity(){ return loadCapacity; }
+    public void setLoadCapacity(double loadCapacity) { this.loadCapacity = loadCapacity; }
 }

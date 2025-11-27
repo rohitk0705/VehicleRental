@@ -27,4 +27,5 @@ public class Bike extends Vehicle implements Rentable {
     public String getExtra(){ return bikeType; }
 
     public String getType(){ return bikeType; }
+    public void setBikeType(String bikeType) { this.bikeType = bikeType; }
 }

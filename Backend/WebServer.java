@@ -29,6 +29,7 @@ public class WebServer {
         server.createContext("/api/rent", new RentHandler());
         server.createContext("/api/return", new ReturnHandler());
         server.createContext("/api/delete", new DeleteHandler());
+        server.createContext("/api/edit", new EditHandler());
 
         server.setExecutor(null);
         System.out.println("Server started on http://localhost:" + port);
@@ -166,6 +167,33 @@ public class WebServer {
                 } else {
                     sendResponse(t, 404, "Vehicle not found");
                 }
+            }
+        }
+    }
+
+    static class EditHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            if("POST".equals(t.getRequestMethod())){
+                Map<String, String> params = parseParams(t);
+                String id = params.get("id");
+                String brand = params.get("brand");
+                String extra = params.get("extra");
+                double price = 0.0;
+                try {
+                    price = Double.parseDouble(params.get("price"));
+                } catch (Exception e) {
+                    price = 0.0;
+                }
+
+                boolean updated = service.updateVehicle(id, brand, extra, price);
+                if (updated) {
+                    sendResponse(t, 200, "Updated");
+                } else {
+                    sendResponse(t, 404, "Vehicle not found or invalid data");
+                }
+            } else {
+                sendResponse(t, 405, "Method Not Allowed");
             }
         }
     }
