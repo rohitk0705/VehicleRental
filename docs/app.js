@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = 'Add Vehicle';
             currentFleet = data;
             renderTable(data);
-            updateStats(data);
+            fetchServerRevenueAndUpdate(data);
         })
         .catch(err => {
             console.log("API not found, switching to Demo Mode (LocalStorage)");
@@ -346,6 +346,20 @@ document.getElementById('editForm').addEventListener('submit', function(e) {
     }
 });
 
+function fetchServerRevenueAndUpdate(data) {
+    fetch('/api/revenue')
+        .then(response => {
+            if (!response.ok) throw new Error('Revenue API Error');
+            return response.json();
+        })
+        .then(payload => {
+            updateStats(data, typeof payload.totalRevenue === 'number' ? payload.totalRevenue : null);
+        })
+        .catch(() => {
+            updateStats(data);
+        });
+}
+
 function loadFleet() {
     if (useLocalStorage) {
         const data = getLocalFleet();
@@ -358,18 +372,20 @@ function loadFleet() {
         .then(data => {
             currentFleet = data;
             renderTable(data);
-            updateStats(data);
+            fetchServerRevenueAndUpdate(data);
         });
     }
 }
 
-function updateStats(data) {
+function updateStats(data, serverRevenue = null) {
     document.getElementById('totalCount').textContent = data.length;
     document.getElementById('availableCount').textContent = data.filter(v => !v.rented).length;
     document.getElementById('rentedCount').textContent = data.filter(v => v.rented).length;
     
     // Calculate Total Revenue (Historical)
-    const revenue = data.reduce((acc, v) => acc + ((v.rentalCount || 0) * parseFloat(v.price || 0)), 0);
+    const revenue = (typeof serverRevenue === 'number')
+        ? serverRevenue
+        : data.reduce((acc, v) => acc + ((v.rentalCount || 0) * parseFloat(v.price || 0)), 0);
     document.getElementById('revenueCount').textContent = formatPrice(revenue);
 }
 

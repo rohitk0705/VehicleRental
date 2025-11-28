@@ -31,6 +31,7 @@ public class WebServer {
         server.createContext("/api/return", new ReturnHandler());
         server.createContext("/api/delete", new DeleteHandler());
         server.createContext("/api/edit", new EditHandler());
+        server.createContext("/api/revenue", new RevenueHandler());
         server.createContext("/api/testdata", new TestDataHandler());
 
         server.setExecutor(null);
@@ -194,6 +195,24 @@ public class WebServer {
                 } else {
                     sendResponse(t, 404, "Vehicle not found or invalid data");
                 }
+            } else {
+                sendResponse(t, 405, "Method Not Allowed");
+            }
+        }
+    }
+
+    static class RevenueHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            if ("GET".equals(t.getRequestMethod())) {
+                double value = service.getTotalRevenue();
+                String json = String.format("{\"totalRevenue\": %.2f}", value);
+                byte[] response = json.getBytes("UTF-8");
+                t.getResponseHeaders().set("Content-Type", "application/json");
+                t.sendResponseHeaders(200, response.length);
+                OutputStream os = t.getResponseBody();
+                os.write(response);
+                os.close();
             } else {
                 sendResponse(t, 405, "Method Not Allowed");
             }

@@ -44,6 +44,7 @@ Both paths use the `TestFleet` dataset (Car/Bike/Truck) so you can immediately e
 - `Backend/Desktop` - Swing GUI implementation.
 - `docs/` - Frontend files (HTML/CSS/JS).
 - `fleet.txt` - Shared database file.
+- `revenue.txt` - Persists cumulative total revenue across sessions.
 
 ## Author
 
