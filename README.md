@@ -28,6 +28,15 @@ Runs a local web server. You can access the dashboard via your browser.
 Runs a standalone Java Swing application.
 - **Double-click** `RunOffline.bat`
 
+### Test Fleet Data
+
+Need some demo vehicles quickly?
+
+- **Online dashboard:** open *Settings → Load Test Fleet → Load Sample Vehicles* to call the `/api/testdata` endpoint and seed the backend.
+- **Offline GUI:** click **Load Test Data** on the toolbar (next to **Import CSV**) to populate the same sample vehicles locally.
+
+Both paths use the `TestFleet` dataset (Car/Bike/Truck) so you can immediately explore analytics, rental flows, and revenue calculations without manually entering vehicles.
+
 ## Project Structure
 
 - `Backend/Common` - Shared business logic and models.

@@ -31,6 +31,7 @@ public class WebServer {
         server.createContext("/api/return", new ReturnHandler());
         server.createContext("/api/delete", new DeleteHandler());
         server.createContext("/api/edit", new EditHandler());
+        server.createContext("/api/testdata", new TestDataHandler());
 
         server.setExecutor(null);
         System.out.println("Server started on http://localhost:" + port);
@@ -193,6 +194,18 @@ public class WebServer {
                 } else {
                     sendResponse(t, 404, "Vehicle not found or invalid data");
                 }
+            } else {
+                sendResponse(t, 405, "Method Not Allowed");
+            }
+        }
+    }
+
+    static class TestDataHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            if ("POST".equals(t.getRequestMethod())) {
+                service.loadTestData();
+                sendResponse(t, 200, "Test data loaded");
             } else {
                 sendResponse(t, 405, "Method Not Allowed");
             }

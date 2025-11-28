@@ -63,6 +63,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    document.getElementById('loadTestDataBtn').addEventListener('click', () => {
+        if (useLocalStorage) {
+            seedLocalTestFleet();
+            loadFleet();
+            alert('Test fleet loaded!');
+        } else {
+            fetch('/api/testdata', { method: 'POST' })
+                .then(response => {
+                    if (!response.ok) throw new Error('Server Error');
+                    return response.text();
+                })
+                .then(() => {
+                    loadFleet();
+                    alert('Test fleet loaded!');
+                })
+                .catch(() => {
+                    alert('Server unavailable, switching to Demo Mode. Loading test data locally.');
+                    useLocalStorage = true;
+                    seedLocalTestFleet();
+                    loadFleet();
+                });
+        }
+    });
+
     // Dark Mode Toggle
     const darkModeToggle = document.getElementById('darkModeToggle');
     darkModeToggle.addEventListener('change', (e) => {
@@ -485,6 +509,23 @@ function getLocalFleet() {
 
 function saveLocalFleet(fleet) {
     localStorage.setItem('vehicle_fleet', JSON.stringify(fleet));
+}
+
+function seedLocalTestFleet() {
+    const defaults = [
+        { id: 'MH01CG9394', type: 'Car', brand: 'Toyota Camry', extra: '5 Seats', price: 50, rented: false, rentalCount: 0 },
+        { id: 'MH02AB1234', type: 'Bike', brand: 'Honda CBR', extra: 'Sports', price: 20, rented: false, rentalCount: 0 },
+        { id: 'MH03XY9876', type: 'Truck', brand: 'Tata Hauler', extra: '1000', price: 150, rented: false, rentalCount: 0 }
+    ];
+
+    const fleet = getLocalFleet();
+    const existing = new Set(fleet.map(v => v.id));
+    defaults.forEach(v => {
+        if (!existing.has(v.id)) {
+            fleet.push({ ...v });
+        }
+    });
+    saveLocalFleet(fleet);
 }
 
 // Removed showDemoBanner function as requested

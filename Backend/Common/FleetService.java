@@ -95,6 +95,13 @@ public class FleetService {
         saveFleet();
     }
 
+    public void loadTestData() {
+        if (!existsId("MH01CG9394")) addVehicle(new Car("MH01CG9394", "Toyota", "5", 50.0));
+        if (!existsId("MH02AB1234")) addVehicle(new Bike("MH02AB1234", "Honda", "Sports", 20.0));
+        if (!existsId("MH03XY9876")) addVehicle(new Truck("MH03XY9876", "Tata", 1000.0, 150.0));
+        saveFleet();
+    }
+
     public void importCsv(File f) throws IOException{
         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             String line;

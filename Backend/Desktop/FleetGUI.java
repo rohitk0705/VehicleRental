@@ -85,6 +85,14 @@ public class FleetGUI extends JFrame implements ActionListener {
         importBtn.addActionListener(this);
         searchPanel.add(importBtn);
 
+        JButton testDataBtn = new JButton("Load Test Data");
+        testDataBtn.addActionListener(e -> {
+            service.loadTestData();
+            refreshTable();
+            JOptionPane.showMessageDialog(this, "Test data loaded!");
+        });
+        searchPanel.add(testDataBtn);
+
         exportBtn = new JButton("Export CSV");
         exportBtn.addActionListener(this);
         searchPanel.add(exportBtn);
