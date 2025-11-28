@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class FleetGUI extends JFrame implements ActionListener {
@@ -16,6 +17,7 @@ public class FleetGUI extends JFrame implements ActionListener {
     private JTextField idField, brandField, extraField, priceField, searchField;
     private JComboBox<String> typeCombo;
     private JButton addBtn, rentBtn, returnBtn, importBtn, exportBtn, clearBtn, exitBtn;
+    private JLabel totalRevenueLabel;
 
     public FleetGUI(File dataFile){
         service = new FleetService(dataFile);
@@ -33,7 +35,7 @@ public class FleetGUI extends JFrame implements ActionListener {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        JPanel top = new JPanel(new GridLayout(2,1));
+        JPanel top = new JPanel(new GridLayout(3,1));
 
         // Input Row
         JPanel inputs = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -107,6 +109,13 @@ public class FleetGUI extends JFrame implements ActionListener {
 
         top.add(searchPanel);
 
+        JPanel summaryPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        summaryPanel.setBorder(BorderFactory.createTitledBorder("Summary"));
+        summaryPanel.add(new JLabel("Total Revenue:"));
+        totalRevenueLabel = new JLabel();
+        summaryPanel.add(totalRevenueLabel);
+        top.add(summaryPanel);
+
         add(top, BorderLayout.NORTH);
 
         model = new DefaultTableModel(
@@ -144,6 +153,15 @@ public class FleetGUI extends JFrame implements ActionListener {
                 v.getExtra()
             });
         }
+
+        updateRevenueLabel();
+    }
+
+    private void updateRevenueLabel(){
+        if (totalRevenueLabel == null) return;
+        double revenue = service.getTotalRevenue();
+        DecimalFormat df = new DecimalFormat("₹#,##0.00");
+        totalRevenueLabel.setText(" " + df.format(revenue));
     }
 
     @Override

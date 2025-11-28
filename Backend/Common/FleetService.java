@@ -6,14 +6,15 @@ import java.util.*;
 public class FleetService {
     private List<Vehicle> fleet = new ArrayList<>();
     private File dataFile;
-    private File revenueFile;
+    private File metricsFile;
     private double totalRevenue = 0.0;
+    private int totalRentals = 0;
 
     public FleetService(File dataFile){
         this.dataFile = dataFile;
-        this.revenueFile = new File("revenue.txt");
+        this.metricsFile = new File("metrics.txt");
         loadFleet();
-        loadRevenue();
+        loadMetrics();
     }
 
     public FleetService() {
@@ -23,6 +24,7 @@ public class FleetService {
     public List<Vehicle> getFleet(){ return fleet; }
 
     public double getTotalRevenue(){ return totalRevenue; }
+    public int getTotalRentals(){ return totalRentals; }
 
     public boolean existsId(String id){
         return fleet.stream().anyMatch(v -> v.getId().equals(id));
@@ -46,7 +48,7 @@ public class FleetService {
         try {
             ((Rentable)v).rent();
             v.incrementRentalCount();
-            addRevenue(v.getPrice());
+            recordRental(v.getPrice());
             saveFleet();
             return v.getTypeName() + " " + id + " rented.";
         } catch (VehicleNotAvailableException e){
@@ -100,6 +102,9 @@ public class FleetService {
     public void clearData(){
         fleet.clear();
         saveFleet();
+        totalRevenue = 0;
+        totalRentals = 0;
+        saveMetrics();
     }
 
     public void loadTestData() {
@@ -168,29 +173,34 @@ public class FleetService {
         }
     }
 
-    private void addRevenue(double amount) {
+    private void recordRental(double amount) {
         if (amount <= 0) return;
         totalRevenue += amount;
-        saveRevenue();
+        totalRentals++;
+        saveMetrics();
     }
 
-    private void loadRevenue() {
+    private void loadMetrics() {
         totalRevenue = 0;
-        if (!revenueFile.exists()) return;
+        totalRentals = 0;
+        if (!metricsFile.exists()) return;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(revenueFile))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(metricsFile))) {
             String line = br.readLine();
             if (line != null) {
-                totalRevenue = Double.parseDouble(line.trim());
+                String[] parts = line.split(",");
+                if (parts.length > 0) totalRevenue = Double.parseDouble(parts[0].trim());
+                if (parts.length > 1) totalRentals = Integer.parseInt(parts[1].trim());
             }
         } catch (IOException | NumberFormatException e) {
             totalRevenue = 0;
+            totalRentals = 0;
         }
     }
 
-    private void saveRevenue() {
-        try (PrintWriter pw = new PrintWriter(new FileWriter(revenueFile))) {
-            pw.println(totalRevenue);
+    private void saveMetrics() {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(metricsFile))) {
+            pw.println(totalRevenue + "," + totalRentals);
         } catch (IOException e) {
             e.printStackTrace();
         }

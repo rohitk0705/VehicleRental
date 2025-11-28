@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = 'Add Vehicle';
             currentFleet = data;
             renderTable(data);
-            fetchServerRevenueAndUpdate(data);
+              fetchServerMetricsAndUpdate(data);
         })
         .catch(err => {
             console.log("API not found, switching to Demo Mode (LocalStorage)");
@@ -346,14 +346,14 @@ document.getElementById('editForm').addEventListener('submit', function(e) {
     }
 });
 
-function fetchServerRevenueAndUpdate(data) {
-    fetch('/api/revenue')
+function fetchServerMetricsAndUpdate(data) {
+    fetch('/api/metrics')
         .then(response => {
-            if (!response.ok) throw new Error('Revenue API Error');
+            if (!response.ok) throw new Error('Metrics API Error');
             return response.json();
         })
         .then(payload => {
-            updateStats(data, typeof payload.totalRevenue === 'number' ? payload.totalRevenue : null);
+            updateStats(data, payload);
         })
         .catch(() => {
             updateStats(data);
@@ -372,19 +372,19 @@ function loadFleet() {
         .then(data => {
             currentFleet = data;
             renderTable(data);
-            fetchServerRevenueAndUpdate(data);
+            fetchServerMetricsAndUpdate(data);
         });
     }
 }
 
-function updateStats(data, serverRevenue = null) {
+function updateStats(data, serverStats = null) {
     document.getElementById('totalCount').textContent = data.length;
     document.getElementById('availableCount').textContent = data.filter(v => !v.rented).length;
     document.getElementById('rentedCount').textContent = data.filter(v => v.rented).length;
     
     // Calculate Total Revenue (Historical)
-    const revenue = (typeof serverRevenue === 'number')
-        ? serverRevenue
+    const revenue = (serverStats && typeof serverStats.totalRevenue === 'number')
+        ? serverStats.totalRevenue
         : data.reduce((acc, v) => acc + ((v.rentalCount || 0) * parseFloat(v.price || 0)), 0);
     document.getElementById('revenueCount').textContent = formatPrice(revenue);
 }

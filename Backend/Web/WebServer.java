@@ -31,7 +31,7 @@ public class WebServer {
         server.createContext("/api/return", new ReturnHandler());
         server.createContext("/api/delete", new DeleteHandler());
         server.createContext("/api/edit", new EditHandler());
-        server.createContext("/api/revenue", new RevenueHandler());
+        server.createContext("/api/metrics", new MetricsHandler());
         server.createContext("/api/testdata", new TestDataHandler());
 
         server.setExecutor(null);
@@ -201,12 +201,13 @@ public class WebServer {
         }
     }
 
-    static class RevenueHandler implements HttpHandler {
+    static class MetricsHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
             if ("GET".equals(t.getRequestMethod())) {
-                double value = service.getTotalRevenue();
-                String json = String.format("{\"totalRevenue\": %.2f}", value);
+                double revenue = service.getTotalRevenue();
+                int rentals = service.getTotalRentals();
+                String json = String.format("{\"totalRevenue\": %.2f, \"totalRentals\": %d}", revenue, rentals);
                 byte[] response = json.getBytes("UTF-8");
                 t.getResponseHeaders().set("Content-Type", "application/json");
                 t.sendResponseHeaders(200, response.length);
